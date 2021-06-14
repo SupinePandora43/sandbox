@@ -70,7 +70,7 @@
 					return;
 				}
 
-				CreateHitEffects( tr.EndPos );
+				CreateHitEffects( tr.EndPos, tr.Normal );
 			}
 		}
 

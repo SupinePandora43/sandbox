@@ -44,7 +44,7 @@ namespace Sandbox.Tools
 
 				if ( Input.Pressed( InputButton.Attack1 ) || Input.Pressed( InputButton.Attack2 ) )
 				{
-					CreateHitEffects( tr.EndPos );
+					CreateHitEffects( tr.EndPos, tr.Normal, true );
 				}
 			}
 		}

@@ -47,12 +47,13 @@
 				if ( !tr.Entity.IsValid() )
 					return;
 
+
 				var attached = !tr.Entity.IsWorld && tr.Body.IsValid() && tr.Body.PhysicsGroup != null && tr.Body.Entity.IsValid();
 
 				if ( attached && tr.Entity is not Prop )
 					return;
 
-				CreateHitEffects( tr.EndPos );
+				CreateHitEffects( tr.EndPos, tr.Normal );
 
 				if ( tr.Entity is WheelEntity )
 				{

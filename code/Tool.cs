@@ -7,7 +7,7 @@ partial class Tool : Carriable
 	[ConVar.ClientData( "tool_current" )]
 	public static string UserToolCurrent { get; set; } = "tool_boxgun";
 
-	public override string ViewModelPath => "weapons/rust_pistol/v_rust_pistol.vmdl";
+	public override string ViewModelPath => "models/weapons/v_toolgun.vmdl";
 
 	[Net, Predicted]
 	public BaseTool CurrentTool { get; set; }
@@ -16,7 +16,7 @@ partial class Tool : Carriable
 	{
 		base.Spawn();
 
-		SetModel( "weapons/rust_pistol/rust_pistol.vmdl" );
+		SetModel( "models/weapons/toolgun.vmdl" );
 	}
 
 	public override void Simulate( Client owner )
@@ -116,9 +116,9 @@ namespace Sandbox.Tools
 			UpdatePreviews();
 		}
 
-		public virtual void CreateHitEffects( Vector3 pos )
+		public virtual void CreateHitEffects( Vector3 pos, Vector3 normal = new Vector3(), bool continuous = false )
 		{
-			Parent?.CreateHitEffects( pos );
+			Parent?.CreateHitEffects( pos, normal, continuous );
 		}
 	}
 }

@@ -27,7 +27,7 @@
 				if ( tr.Entity is Player )
 					return;
 
-				CreateHitEffects( tr.EndPos );
+				CreateHitEffects( tr.EndPos, tr.Normal );
 
 				if ( tr.Entity.IsWorld )
 					return;

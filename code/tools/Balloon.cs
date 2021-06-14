@@ -61,7 +61,7 @@
 				if ( !tr.Entity.IsValid() )
 					return;
 
-				CreateHitEffects( tr.EndPos );
+				CreateHitEffects( tr.EndPos, tr.Normal );
 
 				if ( tr.Entity is BalloonEntity )
 					return;
