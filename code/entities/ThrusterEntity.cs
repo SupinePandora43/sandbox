@@ -3,12 +3,14 @@
 [Library( "ent_thruster" )]
 public partial class ThrusterEntity : Prop, IPhysicsUpdate, IUse
 {
+	[Net]
+	public float ForceMultiplier { get; set; } = 1.0f;
 	public float Force = 1000.0f;
 	public bool Massless = false;
 	public PhysicsBody TargetBody;
 
 	[Net]
-	public bool Enabled { get; set; } = true;
+	public bool Enabled { get; set; } = false;
 
 	public virtual void OnPostPhysicsStep( float dt )
 	{
@@ -16,11 +18,11 @@ public partial class ThrusterEntity : Prop, IPhysicsUpdate, IUse
 		{
 			if ( TargetBody.IsValid() )
 			{
-				TargetBody.ApplyForceAt( Position, Rotation.Down * (Massless ? Force * TargetBody.Mass : Force) );
+				TargetBody.ApplyForceAt( Position, Rotation.Down * (Massless ? Force * ForceMultiplier * TargetBody.Mass : Force) );
 			}
 			else if ( PhysicsBody.IsValid() )
 			{
-				PhysicsBody.ApplyForce( Rotation.Down * (Massless ? Force * PhysicsBody.Mass : Force) );
+				PhysicsBody.ApplyForce( Rotation.Down * (Massless ? Force * ForceMultiplier * PhysicsBody.Mass : Force) );
 			}
 		}
 	}
