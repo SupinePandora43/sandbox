@@ -18,6 +18,9 @@ partial class SandboxPlayer : Player
 
 	public ICamera LastCamera { get; set; }
 
+	public delegate void OnSimulateHandler(SandboxPlayer player);
+	public event OnSimulateHandler OnSimulate;
+
 	public SandboxPlayer()
 	{
 		Inventory = new Inventory( this );
@@ -114,6 +117,7 @@ partial class SandboxPlayer : Player
 		if ( LifeState != LifeState.Alive )
 			return;
 
+		OnSimulate?.Invoke(this);
 		TickPlayerUse();
 		SimulateActiveChild( cl, ActiveChild );
 
