@@ -15,7 +15,7 @@ public partial class SpawnMenu : Panel
 	{
 		Instance = this;
 
-		StyleSheet.Load( "/ui/SpawnMenu.scss" );
+		StyleSheet.Load( "/ui/sandbox/SpawnMenu.scss" );
 
 		var left = Add.Panel( "left" );
 		{
