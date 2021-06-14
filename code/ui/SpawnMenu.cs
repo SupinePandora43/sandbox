@@ -46,7 +46,7 @@ public partial class SpawnMenu : Panel
 				{
 					foreach ( var entry in Library.GetAllAttributes<Sandbox.Tools.BaseTool>() )
 					{
-						if ( entry.Title == "Sandbox.Tools.BaseTool" )
+						if ( entry.Title.StartsWith( "Sandbox.Tools.Base" ) )
 							continue;
 
 						var button = list.Add.Button( entry.Title );
