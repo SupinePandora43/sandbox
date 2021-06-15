@@ -44,7 +44,7 @@
 					}
 					else
 					{
-						target.Weld( rootProp );
+						rootProp.Weld( target );
 						target = null;
 					}
 				}
