@@ -22,7 +22,7 @@ public class CurrentTool : Panel
 		if ( tool != null )
 		{
 			Title.SetText( tool.ClassInfo.Title );
-			Description.SetText( tool.ClassInfo.Description );
+			Description.SetText( tool.Description ?? tool.ClassInfo.Description );
 		}
 	}
 
