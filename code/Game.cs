@@ -115,6 +115,18 @@ namespace SandboxGame
 
 namespace Sandbox.Hooks
 {
+	public static partial class Undos
+	{
+		public static event Action<Func<string>, Entity> OnAddUndo;
+
+		// Add an "Undoable" lambda. Should return the string to show in the toast,
+		// or empty string if the undoable is redundant and should be skipped over (eg. if the weld was already removed)
+		public static void AddUndo(Func<string> undo, Entity owner)
+		{
+			OnAddUndo?.Invoke(undo, owner);
+		}
+	}
+
 	public static partial class Entities
 	{
 		public static event Action<Entity,Entity> OnSpawned;
