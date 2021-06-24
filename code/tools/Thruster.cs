@@ -1,15 +1,18 @@
-﻿namespace Sandbox.Tools
+﻿using MinimalExtended;
+using Sandbox.UI;
+
+namespace Sandbox.Tools
 {
 	[Library( "tool_thruster", Title = "Thruster", Description = "A rocket type thing that can push forwards and backward", Group = "construction" )]
 	public partial class ThrusterTool : BaseTool
 	{
+		[ConVar.ClientData( "tool_thruster_model" )]
+		public string CurrentModel { get; set; } = "models/thruster/thrusterprojector.vmdl";
 		PreviewEntity previewModel;
 		bool massless = true;
-
 		public override void CreatePreviews()
 		{
-			if ( TryCreatePreview( ref previewModel, "models/thruster/thrusterprojector.vmdl" ) )
-			{
+			if ( TryCreatePreview( ref previewModel, GetConvarValue( "tool_thruster_model" ) ) ) {
 				previewModel.RotationOffset = Rotation.FromAxis( Vector3.Right, -90 );
 			}
 		}
@@ -27,6 +30,9 @@
 
 		public override void Simulate()
 		{
+			if ( GetConvarValue( "tool_thruster_model" ) != previewModel.GetModelName() ) {
+				previewModel.SetModel( GetConvarValue( "tool_thruster_model" ) );
+			}
 			if ( !Host.IsServer )
 				return;
 
@@ -82,10 +88,34 @@
 					ent.SetParent( tr.Body.Entity, tr.Body.PhysicsGroup.GetBodyBoneName( tr.Body ) );
 				}
 
-				ent.SetModel( "models/thruster/thrusterprojector.vmdl" );
+				ent.SetModel( GetConvarValue( "tool_thruster_model" ) );
 
-				Sandbox.Hooks.Entities.TriggerOnSpawned(ent, Owner);
+				Sandbox.Hooks.Entities.TriggerOnSpawned( ent, Owner );
 			}
 		}
+
+		public override void Activate()
+		{
+			base.Activate();
+			if ( Host.IsClient ) {
+				var modelSelector = new ModelSelector( new string[] { "thruster" } );
+				SpawnMenu.Instance?.ToolPanel?.AddChild( modelSelector );
+			}
+		}
+	}
+
+	[Library]
+	public class ThrusterModels : IAutoload
+	{
+		public ThrusterModels()
+		{
+			ModelSelector.AddToSpawnlist( "thruster", new string[] {
+				"models/thruster/thrusterprojector.vmdl",
+				"models/citizen_props/trashcan01.vmdl",
+				"models/citizen_props/trashcan02.vmdl",
+			} );
+		}
+		public bool ReloadOnHotload => false;
+		public void Dispose() { }
 	}
 }

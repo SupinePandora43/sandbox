@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 public partial class SpawnMenu : Panel
 {
 	public static SpawnMenu Instance;
+	public Panel ToolPanel { get; private set; }
 
 	public SpawnMenu()
 	{
@@ -59,10 +60,11 @@ public partial class SpawnMenu : Panel
 
 							foreach ( var child in list.Children )
 								child.SetClass( "active", child == button );
+							ToolPanel.DeleteChildren(true);
 						} );
 					}
 				}
-				body.Add.Panel( "inspector" );
+				ToolPanel = body.Add.Panel( "inspector" );
 			}
 		}
 

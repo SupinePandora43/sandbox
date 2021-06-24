@@ -122,6 +122,7 @@
     }
 }
 
+.modelselector,
 .spawnpage {
     display: none;
 
@@ -169,9 +170,16 @@
                 color: #fff;
                 background-color: rgba(black, 0.4);
             }
+        }
+    }
+}
 
-            &:active {
-            }
+.modelselector {
+    max-width: 275px;
+    .canvas {
+        margin: 4px;
+        .cell {
+            padding: 2px;
         }
     }
 }
