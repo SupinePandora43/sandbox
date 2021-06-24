@@ -13,12 +13,12 @@ namespace Sandbox.Tools
 		private int stage { get; set; } = 0;
 		private TraceResult trace1;
 		private TraceResult trace2;
-		private object createdJoint;
+		private IPhysicsJoint createdJoint;
 		private Func<string> createdUndo;
 
 
 		// Dynamic entrypoint for optional Wirebox support, if installed
-		public static Action<Player, TraceResult, ConstraintType, object, Func<string>> CreateWireboxConstraintController;
+		public static Action<Player, TraceResult, ConstraintType, IPhysicsJoint, Func<string>> CreateWireboxConstraintController;
 		private static bool WireboxSupport
 		{
 			get => CreateWireboxConstraintController != null;
@@ -71,7 +71,7 @@ namespace Sandbox.Tools
 								.Create();
 
 							FinishConstraintCreation( joint, () => {
-								if ( joint.IsValid() ) {
+								if ( joint.IsValid ) {
 									joint.Remove();
 									return $"Removed {type} constraint";
 								}
@@ -84,7 +84,7 @@ namespace Sandbox.Tools
 								.To( trace2.Body )
 								.Create();
 							FinishConstraintCreation( joint, () => {
-								if ( joint.IsValid() ) {
+								if ( joint.IsValid ) {
 									joint.Remove();
 									return $"Removed {type} constraint";
 								}
@@ -110,7 +110,7 @@ namespace Sandbox.Tools
 
 							FinishConstraintCreation( joint, () => {
 								rope?.Destroy( true );
-								if ( joint.IsValid() ) {
+								if ( joint.IsValid ) {
 									joint.Remove();
 									return $"Removed {type} constraint";
 								}
@@ -133,7 +133,7 @@ namespace Sandbox.Tools
 
 							FinishConstraintCreation( joint, () => {
 								rope?.Destroy( true );
-								if ( joint.IsValid() ) {
+								if ( joint.IsValid ) {
 									joint.Remove();
 									return $"Removed {type} constraint";
 								}
@@ -153,7 +153,7 @@ namespace Sandbox.Tools
 								// .WithFriction( 1 )
 								.Create();
 							FinishConstraintCreation( joint, () => {
-								if ( joint.IsValid() ) {
+								if ( joint.IsValid ) {
 									joint.Remove();
 									return $"Removed {type} constraint";
 								}
@@ -171,7 +171,7 @@ namespace Sandbox.Tools
 							var rope = MakeRope( trace1, trace2 );
 							FinishConstraintCreation( joint, () => {
 								rope?.Destroy( true );
-								if ( joint.IsValid() ) {
+								if ( joint.IsValid ) {
 									joint.Remove();
 									return $"Removed {type} constraint";
 								}
@@ -243,7 +243,7 @@ namespace Sandbox.Tools
 			return desc;
 		}
 
-		private void FinishConstraintCreation( object joint, Func<string> undo )
+		private void FinishConstraintCreation( IPhysicsJoint joint, Func<string> undo )
 		{
 			Sandbox.Hooks.Undos.AddUndo( undo, Owner );
 
