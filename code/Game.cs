@@ -7,15 +7,18 @@ namespace SandboxGame
 	[Library( "sandbox" )]
 	public partial class SandboxGame : SandboxAddon, IAutoload
 	{
-		private readonly SandboxHud _sandboxHud;
+		private SandboxHud _sandboxHud;
 
 		public bool ReloadOnHotload { get; } = false;
 
 		[Event( "hotloaded" )]
 		public void hotload()
 		{
-
 			Log.Info( "Hotloaded" );
+			if ( IsServer ) {
+				_sandboxHud?.Delete();
+				_sandboxHud = new SandboxHud();
+			}
 		}
 
 		public SandboxGame()
@@ -107,7 +110,6 @@ namespace SandboxGame
 			ent.Position = tr.EndPos;
 			ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw, 0 ) );
 
-			//Log.Info( $"ent: {ent}" );
 			Sandbox.Hooks.Entities.TriggerOnSpawned(ent, owner);
 		}
 	}
