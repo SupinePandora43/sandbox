@@ -281,13 +281,13 @@ namespace Sandbox.Tools
 			var rope = Particles.Create( "particles/rope.vpcf" );
 
 			if ( trace1.Entity.IsWorld ) {
-				rope.SetPos( 0, trace1.EndPos );
+				rope.SetPosition( 0, trace1.EndPos );
 			}
 			else {
 				rope.SetEntityBone( 0, trace1.Entity, trace1.Bone, new Transform( trace1.Entity.Transform.PointToLocal( trace1.EndPos ) ) );
 			}
 			if ( trace2.Entity.IsWorld ) {
-				rope.SetPos( 1, trace2.EndPos );
+				rope.SetPosition( 1, trace2.EndPos );
 			}
 			else {
 				rope.SetEntityBone( 1, trace2.Entity, trace2.Bone, new Transform( trace2.Entity.Transform.PointToLocal( trace2.EndPos ) ) );

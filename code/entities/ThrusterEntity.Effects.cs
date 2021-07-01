@@ -42,6 +42,6 @@ public partial class ThrusterEntity
 			return;
 
 
-		effects.SetPos( 0, Position + Rotation.Up * OOBBox.Maxs.z );
+		effects.SetPosition( 0, Position + Rotation.Up * 20 );
 	}
 }
