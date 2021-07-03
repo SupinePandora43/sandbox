@@ -14,6 +14,9 @@ public partial class SpawnMenu : Panel
 	public ButtonGroup SpawnMenuLeftTabs;
 	public Panel SpawnMenuLeftBody;
 
+	public bool IgnoreMenuButton = false;
+	private bool IsOpen = false;
+
 	public SpawnMenu()
 	{
 		Instance = this;
@@ -48,22 +51,20 @@ public partial class SpawnMenu : Panel
 			{
 				var list = body.Add.Panel( "toollist" );
 				{
-					foreach ( var entry in Library.GetAllAttributes<Sandbox.Tools.BaseTool>() )
-					{
+					foreach ( var entry in Library.GetAllAttributes<Sandbox.Tools.BaseTool>() ) {
 						if ( entry.Title.StartsWith( "Base" ) )
 							continue;
 
 						var button = list.Add.Button( entry.Title );
 						button.SetClass( "active", entry.Name == ConsoleSystem.GetValue( "tool_current" ) );
 
-						button.AddEventListener( "onclick", () =>
-						{
+						button.AddEventListener( "onclick", () => {
 							ConsoleSystem.Run( "tool_current", entry.Name );
 							ConsoleSystem.Run( "inventory_current", "weapon_tool" );
 
 							foreach ( var child in list.Children )
 								child.SetClass( "active", child == button );
-							ToolPanel.DeleteChildren(true);
+							ToolPanel.DeleteChildren( true );
 						} );
 					}
 				}
@@ -73,11 +74,21 @@ public partial class SpawnMenu : Panel
 
 	}
 
+	private bool menuWasPressed = false;
 	public override void Tick()
 	{
 		base.Tick();
 
-		Parent.SetClass( "spawnmenuopen", Input.Down( InputButton.Menu ) );
-	}
+		if ( !IgnoreMenuButton ) {
+			if ( Input.Pressed( InputButton.Menu ) ) {
+				IsOpen = true;
+			}
+			if ( menuWasPressed && !Input.Down( InputButton.Menu ) ) {
+				IsOpen = false;
+			}
+		}
+		menuWasPressed = Input.Down( InputButton.Menu ); // somehow Input.Released wasn't working consistently, so lets emulate it
 
+		Parent.SetClass( "spawnmenuopen", IsOpen );
+	}
 }
