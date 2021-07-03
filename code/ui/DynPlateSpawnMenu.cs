@@ -1,4 +1,7 @@
-
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using MinimalExtended;
 using Sandbox;
 using Sandbox.UI;
@@ -37,9 +40,13 @@ namespace Sandbox
 	{
 		private struct DynPlateDimensions
 		{
+			[JsonInclude]
 			public int x;
+			[JsonInclude]
 			public int y;
+			[JsonInclude]
 			public int z;
+			[JsonInclude]
 			public int scale;
 			public DynPlateDimensions( int x, int y, int z, int scale )
 			{
@@ -49,11 +56,11 @@ namespace Sandbox
 				this.scale = scale;
 			}
 		}
-		VirtualScrollPanel Canvas;
+		private VirtualScrollPanel Canvas;
+		private HashSet<DynPlateDimensions> plates = new();
 
 		public PlateList()
 		{
-			AddClass( "spawnpage" );
 			AddClass( "dynplates" );
 			AddChild( out Canvas, "canvas" );
 
@@ -63,17 +70,71 @@ namespace Sandbox
 				var entry = (DynPlateDimensions)data;
 				var btn = cell.Add.Button( $"{entry.x}x{entry.y}" );
 				btn.AddClass( "icon" );
-				btn.AddEventListener( "onclick", () => ConsoleSystem.Run( "spawn_dynplate", entry.x, entry.y, entry.z, entry.scale ) );
+				btn.AddEventListener( "onclick", () =>
+					ConsoleSystem.Run( "spawn_dynplate", entry.x, entry.y, entry.z, entry.scale )
+				);
 			};
 
-			for ( var x = 1; x <= 12; x++ ) {
-				for ( var y = 12; y <= 12 * 8; y += 12 ) {
-					Canvas.AddItem( new DynPlateDimensions( x * 12, y, 1, 64 ) );
-				}
-				for ( var y = 12 * 8 + 24; y <= 12 * 8 + 24 * 8; y += 24 ) {
-					Canvas.AddItem( new DynPlateDimensions( x * 12, y, 1, 64 ) );
-				}
+			var db = new Save.JsonSaveModule( "dynplate_spawnlist", true );
+			var storedSpawnListSerialized = db.LoadClass<string>( "plates" );
+			if ( storedSpawnListSerialized != null ) {
+				plates = JsonSerializer.Deserialize<HashSet<DynPlateDimensions>>( storedSpawnListSerialized );
 			}
+			else {
+				plates.Add( new DynPlateDimensions( 12, 12, 1, 64 ) );
+				plates.Add( new DynPlateDimensions( 12, 24, 1, 64 ) );
+				plates.Add( new DynPlateDimensions( 24, 24, 1, 64 ) );
+				plates.Add( new DynPlateDimensions( 24, 48, 1, 64 ) );
+				plates.Add( new DynPlateDimensions( 48, 48, 1, 64 ) );
+				plates.Add( new DynPlateDimensions( 48, 96, 1, 64 ) );
+				plates.Add( new DynPlateDimensions( 96, 96, 1, 64 ) );
+			}
+
+			Canvas.SetItems( GetOrderedPlates() );
+
+			var inputContainer = Add.Panel( "input-container" );
+			var dimensionsContainer = inputContainer.Add.Panel( "dimensions-container" );
+			dimensionsContainer.Add.Label( "Rectangles", "header" );
+
+			var lengthContainer = dimensionsContainer.Add.Panel( "flex-column" );
+			lengthContainer.Add.Label( "Length", "input-label" );
+			var lengthEntry = lengthContainer.Add.MenuTextEntry( "48" );
+
+			var widthContainer = dimensionsContainer.Add.Panel( "flex-column" );
+			widthContainer.Add.Label( "Width", "input-label" );
+			var widthEntry = widthContainer.Add.MenuTextEntry( "24" );
+
+			var heightContainer = dimensionsContainer.Add.Panel( "flex-column" );
+			heightContainer.Add.Label( "Height", "input-label" );
+			var heightEntry = heightContainer.Add.MenuTextEntry( "3" );
+
+			var textureSizeContainer = dimensionsContainer.Add.Panel( "flex-column" );
+			textureSizeContainer.Add.Label( "Texture Size", "input-label" );
+			var textureSizeEntry = textureSizeContainer.Add.MenuTextEntry( "64" );
+
+			var spawnButton = dimensionsContainer.Add.Button( "Spawn DynPlate", () => {
+				if ( !int.TryParse( lengthEntry.Text, out int x )
+					|| !int.TryParse( widthEntry.Text, out int y )
+					|| !int.TryParse( heightEntry.Text, out int z )
+					|| !int.TryParse( textureSizeEntry.Text, out int texSize ) ) {
+					return;
+				}
+				ConsoleSystem.Run( "spawn_dynplate", x, y, z, texSize );
+				var added = plates.Add( new DynPlateDimensions( x, y, z, texSize ) );
+				if ( added ) {
+					db.SaveClass( "plates", JsonSerializer.Serialize( plates ) );
+					Canvas.SetItems( GetOrderedPlates() );
+				}
+			} );
+		}
+
+		private IEnumerable<object> GetOrderedPlates()
+		{
+			return plates.OrderBy( plate => plate.x )
+				.ThenBy( plate => plate.y )
+				.ThenBy( plate => plate.z )
+				.ThenBy( plate => plate.scale )
+				.Select( plate => (object)plate );
 		}
 	}
 }
