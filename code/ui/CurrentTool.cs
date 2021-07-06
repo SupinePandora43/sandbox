@@ -26,7 +26,7 @@ public class CurrentTool : Panel
 		}
 	}
 
-	BaseTool GetCurrentTool()
+	public static BaseTool GetCurrentTool()
 	{
 		var player = Local.Pawn;
 		if ( player == null ) return null;

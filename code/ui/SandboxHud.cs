@@ -25,5 +25,12 @@ public partial class SandboxHud : HudEntity<RootPanel>
 		RootPanel.AddChild<CurrentTool>();
 		RootPanel.AddChild<SpawnMenu>();
 		OnHudLoaded?.Invoke();
+		HotReloadTool();
+	}
+
+	[ClientRpc]
+	public static void HotReloadTool()
+	{
+		CurrentTool.GetCurrentTool()?.Activate();
 	}
 }

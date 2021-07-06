@@ -91,7 +91,7 @@ namespace Sandbox
 		public static void CreateQuad( List<MeshVertex> vertices, Ray origin, Vector3 width, Vector3 height, int texSize = 64, Color color = new Color() )
 		{
 			Vector3 normal = origin.Direction;
-			Vector4 tangent = new Vector4( width.Normal, 1 );
+			var tangent = width.Normal;
 
 			MeshVertex a = new( origin.Origin - width - height, normal, tangent, new Vector2( 0, 0 ), color );
 			MeshVertex b = new( origin.Origin + width - height, normal, tangent, new Vector2( width.Length / texSize, 0 ), color );

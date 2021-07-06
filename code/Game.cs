@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Sandbox;
 using MinimalExtended;
 using System;
@@ -12,11 +13,12 @@ namespace SandboxGame
 		public bool ReloadOnHotload { get; } = false;
 
 		[Event( "hotloaded" )]
-		public void hotload()
+		public async void hotload()
 		{
-			Log.Info( "Hotloaded" );
 			if ( IsServer ) {
 				_sandboxHud?.Delete();
+				await Task.Delay( 500 ); // gotta wait for clients to hotreload too
+				Log.Info( "SandboxPlus: hotloading SandboxHud" );
 				_sandboxHud = new SandboxHud();
 			}
 		}
@@ -79,7 +81,7 @@ namespace SandboxGame
 				ent.PhysicsBody.Position -= delta;
 				//DebugOverlay.Line( p, tr.EndPos, 10, false );
 			}
-			Sandbox.Hooks.Entities.TriggerOnSpawned(ent, owner);
+			Sandbox.Hooks.Entities.TriggerOnSpawned( ent, owner );
 		}
 
 		[ServerCmd( "spawn_entity" )]
@@ -110,7 +112,7 @@ namespace SandboxGame
 			ent.Position = tr.EndPos;
 			ent.Rotation = Rotation.From( new Angles( 0, owner.EyeRot.Angles().yaw, 0 ) );
 
-			Sandbox.Hooks.Entities.TriggerOnSpawned(ent, owner);
+			Sandbox.Hooks.Entities.TriggerOnSpawned( ent, owner );
 		}
 	}
 }
@@ -123,19 +125,19 @@ namespace Sandbox.Hooks
 
 		// Add an "Undoable" lambda. Should return the string to show in the toast,
 		// or empty string if the undoable is redundant and should be skipped over (eg. if the weld was already removed)
-		public static void AddUndo(Func<string> undo, Entity owner)
+		public static void AddUndo( Func<string> undo, Entity owner )
 		{
-			OnAddUndo?.Invoke(undo, owner);
+			OnAddUndo?.Invoke( undo, owner );
 		}
 	}
 
 	public static partial class Entities
 	{
-		public static event Action<Entity,Entity> OnSpawned;
+		public static event Action<Entity, Entity> OnSpawned;
 
-		public static void TriggerOnSpawned(Entity spawned, Entity owner)
+		public static void TriggerOnSpawned( Entity spawned, Entity owner )
 		{
-			OnSpawned?.Invoke(spawned, owner);
+			OnSpawned?.Invoke( spawned, owner );
 		}
 	}
 }
