@@ -125,6 +125,11 @@ partial class SandboxPlayer : Player
 			return;
 
 		OnSimulate?.Invoke(this);
+
+		var controller = GetActiveController();
+		if ( controller != null )
+			EnableSolidCollisions = !controller.HasTag( "noclip" );
+
 		TickPlayerUse();
 		SimulateActiveChild( cl, ActiveChild );
 

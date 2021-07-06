@@ -1,7 +1,7 @@
 ﻿using Sandbox;
 
 [Library( "ent_thruster" )]
-public partial class ThrusterEntity : Prop, IPhysicsUpdate, IUse
+public partial class ThrusterEntity : Prop, IUse
 {
 	[Net]
 	public float ForceMultiplier { get; set; } = 1.0f;
@@ -12,7 +12,8 @@ public partial class ThrusterEntity : Prop, IPhysicsUpdate, IUse
 	[Net]
 	public bool Enabled { get; set; } = false;
 
-	public virtual void OnPostPhysicsStep( float dt )
+	[Event.Physics.PostStep]
+	public virtual void OnPostPhysicsStep()
 	{
 		if ( IsServer && Enabled )
 		{
