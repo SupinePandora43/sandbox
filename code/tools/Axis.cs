@@ -10,14 +10,6 @@ namespace Sandbox.Tools
 		private Vector3 LPos1;
 		private Vector3 WPos1, WPos2;
 
-		private enum State
-		{
-			GET_ATTACHABLE,
-			GET_ATTACH_TO_POINT
-		}
-
-		private State state = State.GET_ATTACHABLE;
-
 		public override void Simulate()
 		{
 			if ( !Host.IsServer )
@@ -43,7 +35,7 @@ namespace Sandbox.Tools
 				
 				if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
 				
-				if ( state is State.GET_ATTACHABLE || !body1.IsValid() )
+				if ( !body1.IsValid() )
 				{
 					if ( tr.Entity.IsWorld || tr.Entity is WorldEntity ) return;
 
@@ -54,8 +46,6 @@ namespace Sandbox.Tools
 
 					WPos1 = tr.EndPos;
 					LPos1 = body1.Transform.PointToLocal( WPos1 );
-
-					state = State.GET_ATTACH_TO_POINT;
 				}
 				else
 				{
@@ -63,7 +53,6 @@ namespace Sandbox.Tools
 
 					if ( (!body1.IsValid()) || body1 == body2 )
 					{
-						state = State.GET_ATTACHABLE;
 						return;
 					}
 
@@ -96,7 +85,8 @@ namespace Sandbox.Tools
 					body1.PhysicsGroup?.Wake();
 					body2.PhysicsGroup?.Wake();
 
-					state = State.GET_ATTACHABLE;
+					body1 = null;
+					body2 = null;
 				}
 				CreateHitEffects( tr.EndPos );
 			}
