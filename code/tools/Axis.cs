@@ -3,7 +3,7 @@ namespace Sandbox.Tools
 	[Library( "tool_axis", Title = "Axis", Description = "Physical Axis" )]
 	public partial class AxisTool : BaseTool
 	{
-		private BasePhysics ent1, ent2;
+		private ModelEntity ent1, ent2;
 
 		private Vector3 LNorm1, LNorm2;
 		private Vector3 WNorm1, WNorm2;
@@ -46,7 +46,7 @@ namespace Sandbox.Tools
 					if ( tr.Entity.IsWorld || tr.Entity is WorldEntity ) return;
 					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
 
-					ent1 = (BasePhysics)tr.Entity;
+					ent1 = (ModelEntity)tr.Entity;
 
 					WNorm1 = tr.Normal;
 					LNorm1 = ent1.Transform.NormalToLocal( WNorm1 );
@@ -59,11 +59,12 @@ namespace Sandbox.Tools
 				}
 				else
 				{
+					if ( tr.Entity.IsWorld || tr.Entity is WorldEntity ) return;
 					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
 
-					ent2 = (BasePhysics)tr.Entity;
+					ent2 = (ModelEntity)tr.Entity;
 
-					if ( !ent1.IsValid() )
+					if ( (!ent1.IsValid()) || ent1 == ent2 )
 					{
 						state = State.GET_ATTACHABLE;
 						return;
