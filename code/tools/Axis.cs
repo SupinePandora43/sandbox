@@ -94,6 +94,9 @@ namespace Sandbox.Tools
 						.WithBasis( Rotation.LookAt( tr.Normal ) * Rotation.From( new Angles( 90, 0, 0 ) ) )
 						.Create();
 
+					ent1.PhysicsGroup?.Wake();
+					ent2.PhysicsGroup?.Wake();
+
 					state = State.GET_ATTACHABLE;
 				}
 				CreateHitEffects( tr.EndPos );
