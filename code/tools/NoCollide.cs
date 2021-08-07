@@ -3,7 +3,7 @@
 	[Library( "tool_nocollide", Title = "NoCollide", Description = "Disable collisions" )]
 	public partial class NoCollideTool : BaseTool
 	{
-		private ModelEntity entity;
+		private PhysicsBody body;
 
 		public override void Simulate()
 		{
@@ -30,29 +30,28 @@
 
 				if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
 
-				if ( !entity.IsValid() )
+				if ( !body.IsValid() )
 				{
-					entity = (ModelEntity)tr.Entity;
+					body = tr.Body;
 				}
-				else if ( tr.Entity is ModelEntity modelEntity )
+				else
 				{
-					if ( entity == modelEntity )
+					if ( body == tr.Body )
 					{
-						entity = null;
+						body = null;
 						return;
 					}
 
 					PhysicsJoint.Generic
-						.From( entity.IsWorld ? PhysicsWorld.WorldBody : entity.PhysicsBody )
-						.To( modelEntity.IsWorld ? PhysicsWorld.WorldBody : modelEntity.PhysicsBody )
+						.From( body )
+						.To( tr.Body )
 						.Create();
 
-					entity.PhysicsGroup?.Wake();
-					modelEntity.PhysicsGroup?.Wake();
+					body.PhysicsGroup?.Wake();
+					tr.Body.PhysicsGroup?.Wake();
 
-					entity = null;
+					body = null;
 				}
-				else return;
 
 				CreateHitEffects( tr.EndPos );
 			}
