@@ -76,8 +76,8 @@ namespace Sandbox.Tools
 					#endregion Position
 
 					PhysicsJoint.Revolute
-						.From( body1.Entity.IsWorld ? PhysicsWorld.WorldBody : body1 )
-						.To( body2.Entity.IsWorld ? PhysicsWorld.WorldBody : body2 )
+						.From( body1 )
+						.To( body2 )
 						.WithPivot( tr.EndPos )
 						.WithBasis( Rotation.LookAt( tr.Normal ) * Rotation.From( new Angles( 90, 0, 0 ) ) )
 						.Create();
