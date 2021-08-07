@@ -41,10 +41,11 @@ namespace Sandbox.Tools
 				if ( !tr.Entity.IsValid() )
 					return;
 
+				if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
+				
 				if ( state is State.GET_ATTACHABLE || !ent1.IsValid() )
 				{
 					if ( tr.Entity.IsWorld || tr.Entity is WorldEntity ) return;
-					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
 
 					ent1 = (ModelEntity)tr.Entity;
 
@@ -58,8 +59,6 @@ namespace Sandbox.Tools
 				}
 				else
 				{
-					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
-
 					ent2 = (ModelEntity)tr.Entity;
 
 					if ( (!ent1.IsValid()) || ent1 == ent2 )
