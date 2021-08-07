@@ -41,7 +41,7 @@ namespace Sandbox.Tools
 				if ( !tr.Entity.IsValid() )
 					return;
 
-				if ( state is State.GET_ATTACHABLE )
+				if ( state is State.GET_ATTACHABLE || !ent1.IsValid() )
 				{
 					if ( tr.Entity.IsWorld || tr.Entity is WorldEntity ) return;
 					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
@@ -55,11 +55,9 @@ namespace Sandbox.Tools
 					LPos1 = ent1.Transform.PointToLocal( WPos1 );
 
 					state = State.GET_ATTACH_TO_POINT;
-					CreateHitEffects( tr.EndPos );
 				}
 				else
 				{
-					if ( tr.Entity.IsWorld || tr.Entity is WorldEntity ) return;
 					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
 
 					ent2 = (ModelEntity)tr.Entity;
@@ -91,14 +89,15 @@ namespace Sandbox.Tools
 					#endregion Position
 
 					PhysicsJoint.Revolute
-						.From( ent1.PhysicsBody )
-						.To( ent2.PhysicsBody )
+						.From( ent1.IsWorld ? PhysicsWorld.WorldBody : ent1.PhysicsBody )
+						.To( ent2.IsWorld ? PhysicsWorld.WorldBody : ent2.PhysicsBody )
 						.WithPivot( tr.EndPos )
 						.WithBasis( Rotation.LookAt( tr.Normal ) * Rotation.From( new Angles( 90, 0, 0 ) ) )
 						.Create();
 
 					state = State.GET_ATTACHABLE;
 				}
+				CreateHitEffects( tr.EndPos );
 			}
 		}
 	}
