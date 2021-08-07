@@ -59,8 +59,8 @@ namespace Sandbox.Tools
 				}
 				else
 				{
-					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid())) return;
-					
+					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
+
 					ent2 = (BasePhysics)tr.Entity;
 
 					if ( !ent1.IsValid() )
@@ -69,36 +69,35 @@ namespace Sandbox.Tools
 						return;
 					}
 
+					#region Rotation
+
 					WNorm1 = ent1.Transform.NormalToWorld( LNorm1 );
 					WNorm2 = tr.Normal;
 					LNorm2 = ent2.Transform.NormalToLocal( WNorm2 );
-					
-					WPos1 = ent1.Transform.PointToWorld( LPos1 );
-					WPos2 = tr.EndPos;
-					LPos2 = ent2.Transform.PointToLocal( WPos2 );
 
-					// fun begins
-
-					// turn origin
 					ent1.Rotation = Rotation.LookAt( WNorm2 ) * Rotation.From( new Angles( 0, -180, 0 ) );
-
-					// now turn normal
-					//ent1.Rotation = Rotation.Difference(Rotation.LookAt( ent1.Rotation.Forward), Rotation.LookAt( WNorm1 ));
-
-					//ent1.Rotation = Rotation.LookAt( WNorm1 * WNorm2 );
 					ent1.LocalRotation = Rotation.Difference( Rotation.LookAt( LNorm1 ), ent1.Rotation );
 
-					// fun ends
+					#endregion Rotation
+
+					#region Position
+
+					WPos1 = ent1.Transform.PointToWorld( LPos1 );
+					WPos2 = tr.EndPos;
+
+					ent1.Position += WPos2 - WPos1;
+
+					#endregion Position
+
+					PhysicsJoint.Revolute
+						.From( ent1.PhysicsBody )
+						.To( ent2.PhysicsBody )
+						.WithPivot( tr.EndPos )
+						.WithBasis( Rotation.LookAt( tr.Normal ) * Rotation.From( new Angles( 90, 0, 0 ) ) )
+						.Create();
 
 					state = State.GET_ATTACHABLE;
 				}
-
-				/*var idk = PhysicsJoint.Revolute
-					.From( entity.PhysicsBody )
-					.To( tr.Body )
-					.WithPivot( tr.EndPos )
-					.WithBasis( Rotation.LookAt( tr.Normal ) * Rotation.From( new Angles( 90, 0, 0 ) ) )
-					.Create();*/
 			}
 		}
 	}
