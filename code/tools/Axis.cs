@@ -51,8 +51,9 @@ namespace Sandbox.Tools
 				{
 					body2 = tr.Body;
 
-					if ( (!body1.IsValid()) || body1 == body2 )
+					if ( body1 == body2 )
 					{
+						body1 = null;
 						return;
 					}
 
