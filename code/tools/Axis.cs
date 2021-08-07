@@ -81,9 +81,12 @@ namespace Sandbox.Tools
 
 					// turn origin
 					ent1.Rotation = Rotation.LookAt( WNorm2 ) * Rotation.From( new Angles( 0, -180, 0 ) );
-					
+
 					// now turn normal
-					//ent1.LocalRotation -= Rotation.LookAt( LNorm1 );
+					//ent1.Rotation = Rotation.Difference(Rotation.LookAt( ent1.Rotation.Forward), Rotation.LookAt( WNorm1 ));
+
+					//ent1.Rotation = Rotation.LookAt( WNorm1 * WNorm2 );
+					ent1.LocalRotation = Rotation.Difference( Rotation.LookAt( LNorm1 ), ent1.Rotation );
 
 					// fun ends
 
