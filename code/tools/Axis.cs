@@ -3,28 +3,20 @@ namespace Sandbox.Tools
 	[Library( "tool_axis", Title = "Axis", Description = "Physical Axis" )]
 	public partial class AxisTool : BaseTool
 	{
-		PreviewEntity previewModel;
+		private BasePhysics ent1, ent2;
 
-		protected override bool IsPreviewTraceValid( TraceResult tr )
+		private Vector3 LNorm1, LNorm2;
+		private Vector3 WNorm1, WNorm2;
+		private Vector3 LPos1, LPos2;
+		private Vector3 WPos1, WPos2;
+
+		private enum State
 		{
-			if ( !base.IsPreviewTraceValid( tr ) )
-				return false;
-
-			//if ( tr.Entity is WheelEntity )
-			//	return false;
-
-			return true;
+			GET_ATTACHABLE,
+			GET_ATTACH_TO_POINT
 		}
 
-		public override void CreatePreviews()
-		{
-			if ( TryCreatePreview( ref previewModel, "models/citizen_props/wheel01.vmdl" ) )
-			{
-				previewModel.RotationOffset = Rotation.FromAxis( Vector3.Up, 90 );
-			}
-		}
-
-		Entity entity;
+		private State state = State.GET_ATTACHABLE;
 
 		public override void Simulate()
 		{
@@ -49,29 +41,61 @@ namespace Sandbox.Tools
 				if ( !tr.Entity.IsValid() )
 					return;
 
-				var attached = !tr.Entity.IsWorld && tr.Body.IsValid() && tr.Body.PhysicsGroup != null && tr.Body.Entity.IsValid();
+				if ( state is State.GET_ATTACHABLE )
+				{
+					if ( tr.Entity.IsWorld || tr.Entity is WorldEntity ) return;
+					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
 
-				if ( attached && tr.Entity is not Prop )
-					return;
+					ent1 = (BasePhysics)tr.Entity;
 
-				CreateHitEffects( tr.EndPos );
+					WNorm1 = tr.Normal;
+					LNorm1 = ent1.Transform.NormalToLocal( WNorm1 );
 
-				if ( entity is null ) {
-					entity = tr.Entity;
-					return;
+					WPos1 = tr.EndPos;
+					LPos1 = ent1.Transform.PointToLocal( WPos1 );
+
+					state = State.GET_ATTACH_TO_POINT;
+					CreateHitEffects( tr.EndPos );
+				}
+				else
+				{
+					if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid())) return;
+					
+					ent2 = (BasePhysics)tr.Entity;
+
+					if ( !ent1.IsValid() )
+					{
+						state = State.GET_ATTACHABLE;
+						return;
+					}
+
+					WNorm1 = ent1.Transform.NormalToWorld( LNorm1 );
+					WNorm2 = tr.Normal;
+					LNorm2 = ent2.Transform.NormalToLocal( WNorm2 );
+					
+					WPos1 = ent1.Transform.PointToWorld( LPos1 );
+					WPos2 = tr.EndPos;
+					LPos2 = ent2.Transform.PointToLocal( WPos2 );
+
+					// fun begins
+
+					// turn origin
+					ent1.Rotation = Rotation.LookAt( WNorm2 ) * Rotation.From( new Angles( 0, -180, 0 ) );
+					
+					// now turn normal
+					//ent1.LocalRotation -= Rotation.LookAt( LNorm1 );
+
+					// fun ends
+
+					state = State.GET_ATTACHABLE;
 				}
 
-				entity.Position = tr.EndPos;
-				entity.Rotation = Rotation.LookAt( tr.Normal ) * Rotation.From( new Angles( 0, 90, 0 ) );
-
-				ent.Joint = PhysicsJoint.Revolute
+				/*var idk = PhysicsJoint.Revolute
 					.From( entity.PhysicsBody )
 					.To( tr.Body )
 					.WithPivot( tr.EndPos )
 					.WithBasis( Rotation.LookAt( tr.Normal ) * Rotation.From( new Angles( 90, 0, 0 ) ) )
-					.Create();
-
-				entity = null;
+					.Create();*/
 			}
 		}
 	}
