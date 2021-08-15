@@ -4,10 +4,8 @@
 	public partial class SliderTool : BaseTool
 	{
 		private PhysicsBody body1, body2;
-		private int body1Bone;
 
 		private Vector3 LPos1;
-		private Vector3 WPos1, WPos2;
 
 		public override void Simulate()
 		{
@@ -37,10 +35,8 @@
 				if ( !body1.IsValid() )
 				{
 					body1 = tr.Body;
-					body1Bone = tr.Bone;
 
-					WPos1 = tr.EndPos;
-					LPos1 = body1.Transform.PointToLocal( WPos1 );
+					LPos1 = body1.Transform.PointToLocal( tr.EndPos );
 				}
 				else
 				{
@@ -52,47 +48,16 @@
 						return;
 					}
 
-					WPos1 = body1.Transform.PointToWorld( LPos1 );
-					WPos2 = tr.EndPos;
+					var WPos1 = body1.Transform.PointToWorld( LPos1 );
+					var WPos2 = tr.EndPos;
 
-					#region Rope
-
-					var rope = Particles.Create( "particles/rope.vpcf" );
-
-					if ( body1.Entity.IsWorld )
-					{
-						rope.SetPosition( 0, WPos1 );
-					}
-					else
-					{
-						rope.SetEntityBone( 0, body1.Entity, body1Bone, new Transform( LPos1 * (1.0f / body1.Entity.Scale) ) );
-					}
-
-					var localOrigin2 = tr.Body.Transform.PointToLocal( WPos2 );
-
-					if ( tr.Entity.IsWorld )
-					{
-						rope.SetPosition( 1, localOrigin2 );
-					}
-					else
-					{
-						rope.SetEntityBone( 1, tr.Entity, tr.Bone, new Transform( localOrigin2 * (1.0f / tr.Entity.Scale) ) );
-					}
-
-					#endregion Rope
-
-					var slider = PhysicsJoint.Prismatic
+					PhysicsJoint.Prismatic
 						.From( body1 )
 						.To( body2 )
 						.WithPivot( WPos2 )
 						.WithBasis( Rotation.LookAt( (WPos2 - WPos1).Normal ) * Rotation.From( new Angles( 90, 0, 0 ) ) )
 						.WithCollisionsEnabled()
 						.Create();
-
-					slider.OnBreak( () =>
-					{
-						rope?.Destroy();
-					} );
 
 					body1.PhysicsGroup?.Wake();
 					body2.PhysicsGroup?.Wake();
