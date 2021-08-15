@@ -6,9 +6,7 @@ namespace Sandbox.Tools
 		private PhysicsBody body1, body2;
 
 		private Vector3 LNorm1;
-		private Vector3 WNorm1, WNorm2;
 		private Vector3 LPos1;
-		private Vector3 WPos1, WPos2;
 
 		public override void Simulate()
 		{
@@ -32,20 +30,18 @@ namespace Sandbox.Tools
 
 				if ( !tr.Entity.IsValid() )
 					return;
-				
+
 				if ( !(tr.Body.IsValid() && (tr.Body.PhysicsGroup != null) && tr.Body.Entity.IsValid()) ) return;
-				
+
 				if ( !body1.IsValid() )
 				{
 					if ( tr.Entity.IsWorld || tr.Entity is WorldEntity ) return;
 
 					body1 = tr.Body;
 
-					WNorm1 = tr.Normal;
-					LNorm1 = body1.Transform.NormalToLocal( WNorm1 );
+					LNorm1 = body1.Transform.NormalToLocal( tr.Normal );
 
-					WPos1 = tr.EndPos;
-					LPos1 = body1.Transform.PointToLocal( WPos1 );
+					LPos1 = body1.Transform.PointToLocal( tr.EndPos );
 				}
 				else
 				{
@@ -57,24 +53,10 @@ namespace Sandbox.Tools
 						return;
 					}
 
-					#region Rotation
-
-					WNorm1 = body1.Transform.NormalToWorld( LNorm1 );
-					WNorm2 = tr.Normal;
-
-					body1.Rotation = Rotation.LookAt( WNorm2 ) * Rotation.From( new Angles( 0, -180, 0 ) );
+					body1.Rotation = Rotation.LookAt( tr.Normal ) * Rotation.From( new Angles( 0, -180, 0 ) );
 					body1.Rotation = Rotation.Difference( Rotation.LookAt( LNorm1 ), body1.Rotation );
 
-					#endregion Rotation
-
-					#region Position
-
-					WPos1 = body1.Transform.PointToWorld( LPos1 );
-					WPos2 = tr.EndPos;
-
-					body1.Position += WPos2 - WPos1;
-
-					#endregion Position
+					body1.Position += tr.EndPos - body1.Transform.PointToWorld( LPos1 );
 
 					PhysicsJoint.Revolute
 						.From( body1 )
