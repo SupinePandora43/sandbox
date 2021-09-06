@@ -16,6 +16,7 @@ public partial class SpawnMenu : Panel
 
 	public bool IgnoreMenuButton = false;
 	private bool IsOpen = false;
+	readonly Panel toollist;
 
 	public SpawnMenu()
 	{
@@ -49,24 +50,9 @@ public partial class SpawnMenu : Panel
 			}
 			var body = right.Add.Panel( "body" );
 			{
-				var list = body.Add.Panel( "toollist" );
+				toollist = body.Add.Panel( "toollist" );
 				{
-					foreach ( var entry in Library.GetAllAttributes<Sandbox.Tools.BaseTool>() ) {
-						if ( entry.Title.StartsWith( "Base" ) )
-							continue;
-
-						var button = list.Add.Button( entry.Title );
-						button.SetClass( "active", entry.Name == ConsoleSystem.GetValue( "tool_current" ) );
-
-						button.AddEventListener( "onclick", () => {
-							ConsoleSystem.Run( "tool_current", entry.Name );
-							ConsoleSystem.Run( "inventory_current", "weapon_tool" );
-
-							foreach ( var child in list.Children )
-								child.SetClass( "active", child == button );
-							ToolPanel.DeleteChildren( true );
-						} );
-					}
+					RebuildToolList();
 				}
 				ToolPanel = body.Add.Panel( "inspector" );
 			}
@@ -75,6 +61,28 @@ public partial class SpawnMenu : Panel
 	}
 
 	private bool menuWasPressed = false;
+	void RebuildToolList()
+	{
+		toollist.DeleteChildren( true );
+		
+		foreach ( var entry in Library.GetAllAttributes<Sandbox.Tools.BaseTool>() ) {
+			if ( entry.Title.StartsWith( "Base" ) )
+				continue;
+
+			var button = toollist.Add.Button( entry.Title );
+			button.SetClass( "active", entry.Name == ConsoleSystem.GetValue( "tool_current" ) );
+
+			button.AddEventListener( "onclick", () => {
+				ConsoleSystem.Run( "tool_current", entry.Name );
+				ConsoleSystem.Run( "inventory_current", "weapon_tool" );
+
+				foreach ( var child in toollist.Children )
+					child.SetClass( "active", child == button );
+				ToolPanel.DeleteChildren( true );
+			} );
+		}
+	}
+
 	public override void Tick()
 	{
 		base.Tick();
@@ -90,5 +98,12 @@ public partial class SpawnMenu : Panel
 		menuWasPressed = Input.Down( InputButton.Menu ); // somehow Input.Released wasn't working consistently, so lets emulate it
 
 		Parent.SetClass( "spawnmenuopen", IsOpen );
+	}
+
+	public override void OnHotloaded()
+	{
+		base.OnHotloaded();
+
+		// RebuildToolList();
 	}
 }

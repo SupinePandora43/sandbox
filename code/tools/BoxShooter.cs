@@ -36,5 +36,4 @@
 			Sandbox.Hooks.Entities.TriggerOnSpawned(ent, Owner);
 		}
 	}
-
 }
