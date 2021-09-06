@@ -128,7 +128,7 @@ namespace Sandbox.Tools
 		protected string GetConvarValue(string name, string defaultValue = null)
 		{
 			return Host.IsServer
-				? Owner.GetClientOwner().GetUserString( name, defaultValue )
+				? Owner.GetClientOwner().GetClientData<string>( name, defaultValue )
 				: ConsoleSystem.GetValue( name, default );
 		}
 	}

@@ -21,14 +21,15 @@ namespace Sandbox.UI
 				var material = Material.Load( file );
 
 				// this is inefficient/bad, but I can't find another way to show a material in UI...
-				Scene panel;
+				ScenePanel panel;
 				using ( SceneWorld.SetCurrent( new SceneWorld() ) ) {
 					var mod = SceneObject.CreateModel( "models/maya_testcube_100.vmdl", Transform.Zero );
 					mod.SetMaterialOverride( material );
 
-					Light.Point( Vector3.Up * 150.0f, 500.0f, Color.White * 5000.0f );
+					Light.Point( Vector3.Up * 150.0f, 300.0f, Color.White * 30.0f );
 
-					panel = cell.Add.Scene( SceneWorld.Current, Vector3.Up * 120, new Angles( 90, 0, 0 ), 45, "icon" );
+					panel = cell.Add.ScenePanel( SceneWorld.Current, Vector3.Up * 220, new Angles( 90, 0, 0 ).ToRotation(), 45, "icon" );
+					panel.RenderOnce = true;
 				}
 
 				panel.AddEventListener( "onclick", () => {
